@@ -9,11 +9,18 @@ sys.path.append(os.path.join(ROOT_DIR, 'CBcurl'))
 from utilities import *
 from lookuptable_script import lookuptable_Q_learn
 
-
+# open parameter file
 f = open(os.path.join('parameter_files', 'double_auxotroph.yaml'))
 parameters = yaml.load(f)
 f.close()
 
 validate_param_dict(parameters) # input validation
-save_path = os.path.join('..', 'results')
-lookuptable_Q_learn(parameters, save_path, True)
+save_path = os.path.join('..', 'results', 'LT_double_aux')
+def double_aux_reward(X):
+    
+    if all(x > 2 for x in X):
+        reward = 1
+    else:
+        reward = -1
+    return reward
+lookuptable_Q_learn(parameters, save_path, debug = True, reward_func = double_aux_reward)

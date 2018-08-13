@@ -1,5 +1,4 @@
 import numpy as np
-
 import math
 
 
@@ -61,9 +60,7 @@ def monod(C, C0, Rmax, Km, Km0):
     C0 = np.array(C0)
     Km0 = np.array(Km0)
 
-
     growth_rate = ((Rmax*C)/ (Km + C)) * (C0/ (Km0 + C0))
-
 
     return growth_rate
 
@@ -71,7 +68,7 @@ def monod(C, C0, Rmax, Km, Km0):
 
 def get_explore_rate(episode, MIN_EXPLORE_RATE, denominator): # increase denominator to explore for longer
     '''
-    Calcualtes the logarithmically decreasing explore rate
+    Calculates the logarithmically decreasing explore rate
     Parameters:
         episode: the current episode
         MIN_EXPLORE_RATE: the minimum possible explore_rate
@@ -263,6 +260,7 @@ def convert_to_numpy(param_dict):
         param_dict: the converted parameter dictionary
     '''
     param_dict['ode_params'][1], param_dict['ode_params'][2], param_dict['ode_params'][3] = np.array(param_dict['ode_params'][1]), np.array(param_dict['ode_params'][2]), np.array(param_dict['ode_params'][3])
+
     param_dict['Q_params'][0] = np.array(param_dict['Q_params'][0])
     param_dict['Q_params'][8] = np.array(param_dict['Q_params'][8])
     param_dict['Q_params'][9] = np.array(param_dict['Q_params'][9])
@@ -335,7 +333,7 @@ def validate_param_dict(param_dict):
         raise ValueError("MAX_STEP_SIZE needs to be between zero and one")
     if not 0 <= train_params[7] <= 1:
         raise ValueError("MIN_EXPLORE_RATE needs to be between zero and one")
-    if not all(isinstance(l, int) and l > 0 for l in train_params[8]):
+    if not all(isinstance(l, int) and l > 0 for l in train_params[9]):
         raise ValueError("layers sizes needs to be a list of positive integers")
 
     noise_params = param_dict['noise_params']

@@ -4,8 +4,8 @@ import matplotlib
 import os
 import sys
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(ROOT_DIR)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(ROOT_DIR, 'CBcurl'))
 from utilities import *
 
 A = np.array([[-0.01, -0.06],
@@ -43,7 +43,6 @@ def sdot(S, t, A, params, num_species): # X is population vector, t is time, R i
 t = 0
 
 for C1 in np.arange(C_min, C_max, 0.1):
-
     for C2 in np.arange(C_min, C_max, 0.1):
         for N1 in np.arange(N1_min, N1_max, 0.1):
             for N2 in np.arange(N2_min, N2_max, 0.1):

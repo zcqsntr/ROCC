@@ -32,8 +32,10 @@ train_params:
   - 0.05 # MIN_STEP_SIZE
   - 0.5 # MAX_STEP_SIZE
   - 0. #MIN_EXPLORE_RATE
+  - 0.1 # cuttoff
   - [50,50,50,50]
   - 1000 # buffer_size
+
 
 
 noise_params:

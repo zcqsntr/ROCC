@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -14,7 +13,7 @@ from plot_funcs import *
 from lookuptable_agent import *
 
 
-def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
+def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = False):
     matplotlib.rcParams.update({'font.size': 22})
 
     if debug: print('LOOKUPTABLE')
@@ -22,7 +21,7 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
     param_dict = convert_to_numpy(param_dict) # convert parameters to numpy arrays
 
     # extract parameters
-    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE, MAX_STEP_SIZE, MIN_EXPLORE_RATE, _, _ = param_dict['train_params']
+    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE, MAX_STEP_SIZE, MIN_EXPLORE_RATE, cutoff, _, _  = param_dict['train_params']
     NOISE, error = param_dict['noise_params']
     num_species, num_controlled_species, num_x_states, num_Cin_states = param_dict['Q_params'][1], param_dict['Q_params'][2],  param_dict['Q_params'][3],param_dict['Q_params'][5]
     ode_params = param_dict['ode_params']
@@ -56,16 +55,17 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
         explore_rate = get_explore_rate(episode, MIN_EXPLORE_RATE, explore_denom)
         step_size = get_learning_rate(episode, MIN_STEP_SIZE, MAX_STEP_SIZE, step_denom)
 
-
         #run episode
         for t in range(T_MAX):
             X, C, C0, xSol_next, reward = agent.train_step(X, C, C0, t, explore_rate, step_size, Q_params, ode_params)
+
             if NOISE:
                 X = add_noise(X, error)
+
             xSol = np.append(xSol, xSol_next, axis = 0)
             running_reward += reward
 
-            if (not all(x>1/1000 for x in X)) or t == T_MAX - 1: # if done
+            if (not all(x>cutoff for x in X)) or t == T_MAX - 1: # if done
                 break
 
         # track results
@@ -74,7 +74,7 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
             #print results
             if debug:
                 print('Episode: ',episode)
-                print('Average Time: ',np.mean(episode_ts))
+                print('Average Time steps: ',np.mean(episode_ts))
                 print('Explore rate: ', explore_rate)
                 print('Step size: ', step_size)
                 print('Average Reward: ', np.mean(episode_rewards))
@@ -96,13 +96,11 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
             episode_ts = []
             episode_rewards = []
 
-
             if debug:
                 # plot current population curves
                 plt.figure(figsize = (22.0,12.0))
                 plot_pops(xSol, os.path.join(save_path, 'WORKING_graphs', 'train','LTpops_train_' + str(episode/test_freq) + '.png'))
                 np.save(os.path.join(save_path,'WORKING_data','train','train_' + str(int(episode/test_freq)) + '.npy'), xSol)
-
 
         else:
             episode_rewards.append(running_reward)
@@ -135,7 +133,7 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
     np.save(os.path.join(save_path,'time_sds.npy'), time_sds)
 
     # create and save state action plot
-    LT_actions = np.zeros((num_x_states, num_x_states))
+    LT_actions = np.zeros([num_x_states] * num_species)
     lookuptable = agent.Q_table
     for i in range(num_x_states):
         for j in range(num_x_states):
@@ -143,12 +141,12 @@ def lookuptable_Q_learn(param_dict, save_path, debug, reward_func = False):
             if np.count_nonzero(lookuptable[i,j]) == 0:
                 LT_actions[i,j] = - 1
     np.save(os.path.join(save_path,'state_action.npy'), LT_actions)
-    print(LT_actions)
+
+    print(np.rot90(LT_actions))
 
     return agent.Q_table
 
 
-DEBUG_MODE = False
 
 if __name__ == '__main__': # for the server
 
@@ -180,4 +178,4 @@ if __name__ == '__main__': # for the server
     except:
         save_path = '/home/zcqsntr/Scratch/lookup/WORKING/'
 
-    Q_table = lookup_table_Q_learn(single_auxotroph, save_path, True)
+    Q_table = lookup_table_Q_learn(single_auxotroph, save_path, debug = True)

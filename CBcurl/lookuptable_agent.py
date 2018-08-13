@@ -14,9 +14,10 @@ class LookupTableAgent():
         Parameters:
             num_x_states: the number of discrete population states the agent can see for each species
             num_Cin_states: the number of different nutrient concentrations the agents can use for each auxotroph
-            num_speceis: the number of different bacterial populations
+            num_species: the number of different bacterial populations
         '''
 
+        # set reward function if given
         if reward_func:
             self.reward = reward_func
         else:
@@ -66,18 +67,18 @@ class LookupTableAgent():
         # select an action
         action_indeces = self.select_action(state, explore_rate, num_Cin_states, num_controlled_species)
         action_index = np.ravel_multi_index(action_indeces, [num_Cin_states] * num_controlled_species) # turn into one hot index
-        Cin = action_to_state(action_index, num_controlled_species, num_Cin_states, Cin_bounds) #turn index into C0
+        Cin = action_to_state(action_index, num_controlled_species, num_Cin_states, Cin_bounds) # convert chosen action index to a concentration
 
-        if num_species - num_controlled_species == 1:
+        if num_species - num_controlled_species == 1: # hacky way to check for single zuxotroph system
             Cin = np.append([1], Cin)
 
         #create state vector
         S = np.append(X, C)
         S = np.append(S, C0)
 
-        # execute action
 
-        time_diff = 4
+        # get next timsteps
+        time_diff = 4  # frame skipping
         sol = odeint(sdot, S, [t + x *1 for x in range(time_diff)], args=(Cin,A,ode_params, num_species))[1:]
 
         # extract next values from sol
@@ -94,7 +95,7 @@ class LookupTableAgent():
 
         reward = self.reward(X1)
 
-        #desctrise new state for next interation
+        #discritise new state for next interation
         state1 = state_to_bucket(X1, x_bounds, num_x_states)
 
         # update Q table

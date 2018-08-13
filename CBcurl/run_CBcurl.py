@@ -3,10 +3,7 @@ import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 import yaml
-'''
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(ROOT_DIR)
-'''
+
 
 from utilities import *
 from neural_script import neural_Q_learn

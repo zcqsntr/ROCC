@@ -11,13 +11,14 @@ class NeuralAgent():
     '''
     Class that handles reinforcement learning using a deep Q network to  store state-action value estimates
     '''
-    def __init__(self, layer_sizes, buffer_size, target = True, reward_func = False):
+    def __init__(self, layer_sizes, buffer_size, target = False, reward_func = False):
         '''
         Parameters:
             layer_sizes: list holding the numebr of nodes in each layer, including input and output layers
             target: whether or not a seperate target network is used
         '''
 
+        # set reward func if given
         if reward_func:
             self.reward = reward_func
         else:
@@ -112,10 +113,10 @@ class NeuralAgent():
         S = np.append(X, C)
         S = np.append(S, C0)
 
-        #turn action index into continuous state
+        # convert chosen action index to a concentration
         Cin = action_to_state(action, num_controlled_species, num_Cin_states, Cin_bounds) # take out this line to remove the effect of the algorithm
 
-        if num_species - num_controlled_species == 1:
+        if num_species - num_controlled_species == 1: # hacky way to check for single zuxotroph system
             Cin = np.append([1], Cin)
 
         time_diff = 4 # frame skipping
@@ -173,15 +174,18 @@ class NeuralAgent():
         S = np.append(X, C)
         S = np.append(S, C0)
 
-
+        # convert chosen action index to a concentration
         Cin = action_to_state(action, num_controlled_species, num_Cin_states, Cin_bounds) # take out this line to remove the effect of the algorithm
-        #Cin = np.append([1], Cin)
 
-        time_diff = 4
+        if num_species - num_controlled_species == 1: # hacky way to check for auxotroph system
+            Cin = np.append([1], Cin)
+
+        # get next time step
+        time_diff = 4  # frame skipping
         sol = odeint(sdot, S, [t + x *1 for x in range(time_diff)], args=(Cin,A,ode_params, num_species))[1:]
 
+        # extract information from sol
         xSol = sol[:, 0:2]
-
         X1 = sol[-1, :num_species]
         C1 = sol[-1, num_species:-1]
         C01 = sol[-1, -1]
@@ -193,7 +197,7 @@ class NeuralAgent():
 
         # turn new state into one hot vector
         state1 = state_to_one_hot(X1, num_species, x_bounds, num_x_states) # flatten to a vector
-        reward = self.simple_reward(X1)
+        reward = self.reward(X1)
 
         self.experience_buffer.add([state, action, reward, state1])
 
@@ -234,9 +238,13 @@ class NeuralAgent():
         S = np.append(X, C)
         S = np.append(S, C0)
 
-        # turn action index into continuous vector
+        # convert chosen action index to a concentration
         Cin = action_to_state(action, num_controlled_species, num_Cin_states, Cin_bounds) # take out this line to remove the effect of the algorithm
 
+        if num_species - num_controlled_species == 1: # hacky way to check for auxotroph system
+            Cin = np.append([1], Cin)
+
+        # get next time step
         time_diff = 4 # frame skipping
         sol = odeint(sdot, S, [t + x *1 for x in range(time_diff)], args=(Cin,A,ode_params, num_species))[1:]
 
@@ -291,7 +299,7 @@ class NeuralAgent():
 
         #update target network
         target_update_freq = 100
-        tau = 1.
+        tau = 1. # proportion of primary network used in update
         if nIters % target_update_freq == 0:
             # update target network to the primary networks weights
             primary_vars = tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope = 'primary')

@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import yaml
 import scipy.integrate as spi
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(ROOT_DIR)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(ROOT_DIR, 'CBcurl'))
 
 
 from utilities import *

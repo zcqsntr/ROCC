@@ -6,8 +6,8 @@ import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(ROOT_DIR)
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(ROOT_DIR, 'CBcurl'))
 
 
 from utilities import *
