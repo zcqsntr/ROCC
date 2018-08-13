@@ -1,0 +1,2 @@
+model_checkpoint_path: "/Users/Neythen/masters_project/project_code/A_estimation/saved/trained_network.ckpt"
+all_model_checkpoint_paths: "/Users/Neythen/masters_project/project_code/A_estimation/saved/trained_network.ckpt"
