@@ -7,7 +7,7 @@ C0 = 1.
 q = 0.5
 
 
-
+# read in steady states
 for line in f:
     if line[0] == '[':
         line = line.replace("[", " ")

@@ -191,8 +191,8 @@ f = open('/Users/Neythen/masters_project/results/lookup_table_results/simple_aux
 
 auxotroph_SSs = []
 
+# read in all steady states
 for line in f:
-
     if line[0] == '[':
         line = line.replace("[", " ")
         line = line.replace("]", " ")

@@ -16,11 +16,12 @@ f.close()
 
 validate_param_dict(parameters) # input validation
 save_path = os.path.join('..', 'results', 'LT_double_aux')
+
 def double_aux_reward(X):
-    
     if all(x > 2 for x in X):
         reward = 1
     else:
         reward = -1
     return reward
+
 lookuptable_Q_learn(parameters, save_path, debug = True, reward_func = double_aux_reward)

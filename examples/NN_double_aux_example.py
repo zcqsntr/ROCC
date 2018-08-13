@@ -18,7 +18,6 @@ validate_param_dict(parameters) # input validation
 save_path = os.path.join('..', 'results', 'NN_double_aux')
 
 def double_aux_reward(X):
-    
     if all(x > 2 for x in X):
         reward = 1
     else:

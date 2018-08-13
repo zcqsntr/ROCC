@@ -33,7 +33,10 @@ optional arguments:
   - -r, --repeats: the number of time the training run should be repeated
 
 ### Examples
-The examples directory contains examples including the single auxotroph system, double auxotroph system and the smaller target system. These show how the functions can be imported into a script and used to carry out reinforcement learning on a system specified in a parameter file. These examples are run with python
+The examples directory contains examples including the single auxotroph system, double auxotroph system and the smaller target system. These show how the functions can be imported into a script and used to carry out reinforcement learning on a system specified in a parameter file. These examples are run with python, for example:
+```console
+:examples $ python LT_single_aux_example.py
+```
 
 ### Testing
 In the testing directory run
@@ -42,3 +45,7 @@ In the testing directory run
 :testing $ py.test
 ```
 to run all unit tests.
+
+
+### misc
+The misc directory contains code that is not directly involved in the application. This includes the code used for the simulations to find steady states, the analysis of the eigenvalues of the Jacobian at these steady states and plotting code.
