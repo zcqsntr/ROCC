@@ -34,22 +34,22 @@ optional arguments:
 Results will automatically be saved a directory structure will be created in the supplied save_path:
 
 ```
-save_path\
- ├── WORKING_data\
- │   ├── train\
- │   ├── train_survival.npy\
- │   ├── pops.npy\
- │   ├── train_rewards.npy\
- │   ├── time_sds.npy\
- │   └── reward_sds.npy\
- ├── WORKING_graphs\
- │   ├── train\
- │   ├── train_survival.npy\
- │   ├── pops.npy\
- │   └── train_rewards.npy\
- ├── WORKING_saved_network\
- ├── Q_table.npy\
- ├── state_action.npy\
+save_path
+ ├── WORKING_data
+ │   ├── train
+ │   ├── train_survival.npy
+ │   ├── pops.npy
+ │   ├── train_rewards.npy
+ │   ├── time_sds.npy
+ │   └── reward_sds.npy
+ ├── WORKING_graphs
+ │   ├── train
+ │   ├── train_survival.npy
+ │   ├── pops.npy
+ │   └── train_rewards.npy
+ ├── WORKING_saved_network
+ ├── Q_table.npy
+ ├── state_action.npy
  └── visited_states.npy
 ```
 
