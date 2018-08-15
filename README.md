@@ -33,9 +33,9 @@ optional arguments:
 
 Results will automatically be saved a directory structure will be created in the supplied save_path.
 
-save_path
- ├── WORKING_data
- │   ├── train
+save_path\
+ ├── WORKING_data\
+ │   ├── train\
  │   ├── train_survival.npy
  │   ├── Pops.npy
  │   ├── train_rewards.npy
