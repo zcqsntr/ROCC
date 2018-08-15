@@ -37,18 +37,28 @@ save_path\
  ├── WORKING_data\
  │   ├── train\
  │   ├── train_survival.npy\
- │   ├── Pops.npy\
+ │   ├── pops.npy\
  │   ├── train_rewards.npy\
  │   ├── time_sds.npy\
  │   └── reward_sds.npy\
  ├── WORKING_graphs\
  │   ├── train\
  │   ├── train_survival.npy\
- │   ├── Pops.npy\
+ │   ├── pops.npy\
  │   └── train_rewards.npy\
  ├── Q_table.npy\
  ├── state_action.npy\
  └── visited_states.npy
+
+
+ .
+├── build                   # Compiled files (alternatively `dist`)
+├── docs                    # Documentation files (alternatively `doc`)
+├── src                     # Source files (alternatively `lib` or `app`)
+├── test                    # Automated tests (alternatively `spec` or `tests`)
+├── tools                   # Tools and utilities
+├── LICENSE
+└── README.md
 
 
 ### Examples
