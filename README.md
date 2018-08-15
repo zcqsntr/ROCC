@@ -36,16 +36,16 @@ Results will automatically be saved a directory structure will be created in the
 save_path\
  ├── WORKING_data\
  │   ├── train\
- │   ├── train_survival.npy
- │   ├── Pops.npy
- │   ├── train_rewards.npy
- │   ├── time_sds.npy
- │   └── reward_sds.npy
- ├── WORKING_graphs
- │   ├── train
- │   ├── train_survival.npy
- │   ├── Pops.npy
- │   ├── train_rewards.npy
+ │   ├── train_survival.npy\
+ │   ├── Pops.npy\
+ │   ├── train_rewards.npy\
+ │   ├── time_sds.npy\
+ │   └── reward_sds.npy\
+ ├── WORKING_graphs\
+ │   ├── train\
+ │   ├── train_survival.npy\
+ │   ├── Pops.npy\
+ │   ├── train_rewards.npy\
 
 
 
