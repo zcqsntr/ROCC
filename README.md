@@ -33,6 +33,7 @@ optional arguments:
 
 Results will automatically be saved a directory structure will be created in the supplied save_path:
 
+```
 save_path\
  ├── WORKING_data\
  │   ├── train\
@@ -50,6 +51,7 @@ save_path\
  ├── Q_table.npy\
  ├── state_action.npy\
  └── visited_states.npy
+```
 
 WORKING_data contains the numpy arrays of gathered training data. train contains population curve of a training episode at intervals given by the test_freq parameter, these are only saved if DEBUG = True. train_survival.npy contains moving averages of the survival times of the episodes in the training run, time_sds.npy contains the standard deviations of these moving averages. train_rewards.npy contains moving averages of the rewards of the episodes in the training run, reward_sds.npy contains the standard deviations of these moving averages. pop.npy contains the population of the final episode after the agent has been trained.
 
