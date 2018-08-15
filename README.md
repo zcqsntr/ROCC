@@ -45,8 +45,10 @@ save_path\
  │   ├── train\
  │   ├── train_survival.npy\
  │   ├── Pops.npy\
- │   ├── train_rewards.npy\
-
+ │   └── train_rewards.npy\
+ ├── Q_table.npy
+ ├── state_action.npy
+ └── visited_states.npy
 
 
 ### Examples
