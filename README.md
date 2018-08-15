@@ -31,7 +31,7 @@ optional arguments:
   - -r, --repeats: the number of time the training run should be repeated
 
 
-Results will automatically be saved a directory structure will be created in the supplied save_path.
+Results will automatically be saved a directory structure will be created in the supplied save_path:
 
 save_path\
  ├── WORKING_data\
@@ -46,19 +46,23 @@ save_path\
  │   ├── train_survival.npy\
  │   ├── pops.npy\
  │   └── train_rewards.npy\
+ ├── WORKING_saved_network\
  ├── Q_table.npy\
  ├── state_action.npy\
  └── visited_states.npy
 
+WORKING_data contains the numpy arrays of gathered training data. train contains population curve of a training episode at intervals given by the test_freq parameter, these are only saved if DEBUG = True. train_survival.npy contains moving averages of the survival times of the episodes in the training run, time_sds.npy contains the standard deviations of these moving averages. train_rewards.npy contains moving averages of the rewards of the episodes in the training run, reward_sds.npy contains the standard deviations of these moving averages. pop.npy contains the population of the final episode after the agent has been trained.
 
- .
-├── build                   # Compiled files (alternatively `dist`)
-├── docs                    # Documentation files (alternatively `doc`)
-├── src                     # Source files (alternatively `lib` or `app`)
-├── test                    # Automated tests (alternatively `spec` or `tests`)
-├── tools                   # Tools and utilities
-├── LICENSE
-└── README.md
+WORKING_graphs contains .png graphs of the data in WORKING_data.
+
+WORKING_saved_network contains the saved Q network, only saved by a neural agent
+
+Q_table.npy contains the final Q_table, only saved by a lookuptable_agent
+
+state_action.npy conatins the state action array
+
+visited_states.npy contains an array of the number of times each state was visited, only saved by a neural agent
+
 
 
 ### Examples
