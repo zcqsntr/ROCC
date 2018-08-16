@@ -1,11 +1,12 @@
 ## CBcurl: Control of Bacterial communities using reinforcement learning
+An application to train reinforcement learning to control a chemostat containing multiple interacting populations of bacteria.
 
 ### Installation
 To use the package within python scropts, `CBcurl` must be in PYTHONPATH.
 To use the package from the command line `CBcurl` must be in you $PATH variable
 
 ### Dependencies
-Standard python dependencies are required: `numpy`, `scipy`, `matplotlib`.`yaml` is required to parse parameter files. `argparse` is required for the command line application. `pytest` is required to run the unit tests. If you would like to use the neural network functionality then `TensorFlow` is required, the lookuptable versions of the agents will work without 'TensorFlow'. Instructions for installing 'TensorFlow' can be found here:
+Standard python dependencies are required: `numpy`, `scipy`, `matplotlib`.`yaml` is required to parse parameter files. `argparse` is required for the command line application. `pytest` is required to run the unit tests. If you would like to use the neural network functionality then `TensorFlow` is required. The lookuptable versions of the agents will work without 'TensorFlow' if the lookuptable_Q_learn function is imported into a script (see examples). Instructions for installing 'TensorFlow' can be found here:
  https://www.tensorflow.org/install/
 
 ### User Instructions
@@ -65,7 +66,7 @@ state_action.npy conatins the state action array
 
 visited_states.npy contains an array of the number of times each state was visited, only saved by a neural agent
 
-
+The user can define a system and the training parameters by creating a .yaml parameter file. Examples of these for multiple two and three species systems are found in the examples/parameter_files directory.
 
 ### Examples
 The examples directory contains examples including the single auxotroph system, double auxotroph system and the smaller target system. These show how the functions can be imported into a script and used to carry out reinforcement learning on a system specified in a parameter file. These can be run without adding CBcurl to PYTHON_PATH. As they take a ling time to run, some of them have been run already and the results are in the results directory. These examples are run with python, for example:
