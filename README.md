@@ -68,7 +68,7 @@ visited_states.npy contains an array of the number of times each state was visit
 
 
 ### Examples
-The examples directory contains examples including the single auxotroph system, double auxotroph system and the smaller target system. These show how the functions can be imported into a script and used to carry out reinforcement learning on a system specified in a parameter file. These examples are run with python, for example:
+The examples directory contains examples including the single auxotroph system, double auxotroph system and the smaller target system. These show how the functions can be imported into a script and used to carry out reinforcement learning on a system specified in a parameter file. These can be run without adding CBcurl to PYTHON_PATH. As they take a ling time to run, some of them have been run already and the results are in the results directory. These examples are run with python, for example:
 ```console
 $ python LT_single_aux_example.py
 ```

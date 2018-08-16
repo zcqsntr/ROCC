@@ -98,9 +98,9 @@ class NeuralAgent():
             reward
         '''
 
-        A, num_species, num_controlled_species, num_x_states, x_bounds, num_Cin_states, Cin_bounds, gamma = Q_params # extract parameters
+        A, num_species, num_controlled_species, num_N_states, N_bounds, num_Cin_states, Cin_bounds, gamma = Q_params # extract parameters
 
-        state = state_to_one_hot(X, num_species, x_bounds, num_x_states) # flatten to a on hot vector
+        state = state_to_one_hot(X, num_species, N_bounds, num_N_states) # flatten to a on hot vector
         allQ = np.array(sess.run(self.predQ, feed_dict= {self.inputs:state})) # get Q values for this state
         visited_states += state # count states visited
 
@@ -133,7 +133,7 @@ class NeuralAgent():
         assert len(C1) == num_species, 'C is the wrong length: ' + str(len(C1))
 
         # turn new state into one hot vector
-        state1 = state_to_one_hot(X1, num_species, x_bounds, num_x_states) # flatten to a vector
+        state1 = state_to_one_hot(X1, num_species, N_bounds, num_N_states) # flatten to a vector
         reward = self.reward(X1)
 
         # get Q values for new state
@@ -165,9 +165,9 @@ class NeuralAgent():
             C01: concentration of the carbon source at next time point
         '''
 
-        A, num_species, num_controlled_species, num_x_states, x_bounds, num_Cin_states, Cin_bounds, gamma = Q_params # extract parameters
+        A, num_species, num_controlled_species, num_N_states, N_bounds, num_Cin_states, Cin_bounds, gamma = Q_params # extract parameters
 
-        state = state_to_one_hot(X, num_species, x_bounds, num_x_states) # flatten to a vector
+        state = state_to_one_hot(X, num_species, N_bounds, num_N_states) # flatten to a vector
         action = np.random.randint(num_Cin_states**num_controlled_species) # choose random action
 
         # get new state and reward
@@ -190,13 +190,12 @@ class NeuralAgent():
         C1 = sol[-1, num_species:-1]
         C01 = sol[-1, -1]
 
-
         assert len(Cin) == num_species, 'Cin is the wrong length: ' + str(len(Cin))
         assert len(X1) == num_species, 'X is the wrong length: ' + str(len(X))
         assert len(C1) == num_species, 'C is the wrong length: ' + str(len(C1))
 
         # turn new state into one hot vector
-        state1 = state_to_one_hot(X1, num_species, x_bounds, num_x_states) # flatten to a vector
+        state1 = state_to_one_hot(X1, num_species, N_bounds, num_N_states) # flatten to a vector
         reward = self.reward(X1)
 
         self.experience_buffer.add([state, action, reward, state1])
@@ -224,9 +223,9 @@ class NeuralAgent():
             nIters: the number of training iterations since last update of the target network
         '''
 
-        A, num_species, num_controlled_species, num_x_states, x_bounds, num_Cin_states, Cin_bounds, gamma = Q_params
+        A, num_species, num_controlled_species, num_N_states, N_bounds, num_Cin_states, Cin_bounds, gamma = Q_params
 
-        state = state_to_one_hot(X, num_species, x_bounds, num_x_states) # flatten to a vector
+        state = state_to_one_hot(X, num_species, N_bounds, num_N_states) # flatten to a vector
 
         if np.random.rand(1) < explore_rate:
             action = np.random.randint(num_Cin_states**num_controlled_species)
@@ -259,7 +258,7 @@ class NeuralAgent():
         assert len(C1) == num_species, 'C is the wrong length: ' + str(len(C1))
 
         # turn new state into one hot vector
-        state1 = state_to_one_hot(X1, num_species, x_bounds, num_x_states) # flatten to a vector
+        state1 = state_to_one_hot(X1, num_species, N_bounds, num_N_states) # flatten to a vector
 
         reward = self.reward(X1)
 
@@ -274,10 +273,10 @@ class NeuralAgent():
         states, actions, rewards, state1s = [],[],[],[]
         for experience_trace in experience_sample:
             for experience in experience_trace:
-                states.append(create_one_hot(num_x_states**num_species, experience[0])[0])
+                states.append(create_one_hot(num_N_states**num_species, experience[0])[0])
                 actions.append(experience[1])
                 rewards.append(experience[2])
-                state1s.append(create_one_hot(num_x_states**num_species, experience[1])[0])
+                state1s.append(create_one_hot(num_N_states**num_species, experience[1])[0])
 
         states, actions, rewards, state1s = np.array(states), np.array(actions), np.array(rewards), np.array(state1s)
 

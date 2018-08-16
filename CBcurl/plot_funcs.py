@@ -17,10 +17,10 @@ def plot_pops(xSol, save_path = False):
     plt.xlim(xmin = 0)
 
     try:
-        plt.savefig(save_path)
         plt.xlabel('Timestep')
         plt.ylabel('Population (A.U.)')
         plt.title('Populations After Training')
+        plt.savefig(save_path)
 
         plt.close()
     except:
@@ -44,7 +44,7 @@ def plot_survival(ts, save_path, NUM_EPISODES, T_MAX, phase):
 
 def plot_rewards(rewards, save_path, NUM_EPISODES, T_MAX, phase):
     '''Plots the total reward recieved per episode against episode'''
-    
+
     plt.plot(np.linspace(0, NUM_EPISODES, len(rewards)), rewards)
     plt.xlim(xmin = 0)
     plt.title(phase + ' Rewards')

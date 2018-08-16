@@ -16,6 +16,21 @@ from neural_agent import *
 from plot_funcs import *
 
 def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
+    '''
+    Carries out a training run using a neural agent
+
+    Parameters:
+        param_dict: dictionary containing the parameters of the system to be
+            trained on
+        save_path: path to save results
+        debug: if True debug inforamtion is periodically displayed and
+            intermediate population plots
+        reward_func: optional reward function that can be applied
+
+    Returns:
+        Q_actions: the learned state-action plot
+    '''
+
     matplotlib.rcParams.update({'font.size': 22})
     if debug: print('NEURAL')
 
@@ -23,9 +38,11 @@ def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
     param_dict = convert_to_numpy(param_dict)
 
     #extract parameters
-    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE, MAX_STEP_SIZE, MIN_EXPLORE_RATE, cutoff, hidden_layers, buffer_size = param_dict['train_params']
+    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE,\
+        MAX_STEP_SIZE, MIN_EXPLORE_RATE, cutoff, hidden_layers, buffer_size = param_dict['train_params']
     NOISE, error = param_dict['noise_params']
-    num_species, num_controlled_species, num_x_states, num_Cin_states = param_dict['Q_params'][1], param_dict['Q_params'][2],  param_dict['Q_params'][3],param_dict['Q_params'][5]
+    num_species, num_controlled_species, num_N_states, num_Cin_states = \
+        param_dict['Q_params'][1], param_dict['Q_params'][2],  param_dict['Q_params'][3],param_dict['Q_params'][5]
     ode_params = param_dict['ode_params']
     Q_params = param_dict['Q_params'][0:8]
     initial_X = param_dict['Q_params'][8]
@@ -33,10 +50,10 @@ def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
     initial_C0 = param_dict['Q_params'][10]
 
 
-    tf.reset_default_graph() #Clear the Tensorflow graph.
+    tf.reset_default_graph() #clear the tensorflow graph.
 
     #initialise agent, saver and tensorflow graph
-    layer_sizes = [num_x_states**num_species] + hidden_layers + [num_Cin_states**num_controlled_species]
+    layer_sizes = [num_N_states**num_species] + hidden_layers + [num_Cin_states**num_controlled_species]
     agent = NeuralAgent(layer_sizes, buffer_size, True, reward_func)
     saver = tf.train.Saver()
     init = tf.global_variables_initializer()
@@ -47,13 +64,11 @@ def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
     os.makedirs(os.path.join(save_path,'WORKING_graphs','train'), exist_ok = True)
     os.makedirs(os.path.join(save_path,'WORKING_saved_network'), exist_ok = True)
 
-
-
     with tf.Session() as sess:
         sess.run(init)
 
         #initialise results tracking
-        visited_states = np.zeros((1,num_x_states**num_species))
+        visited_states = np.zeros((1,num_N_states**num_species))
         rewards_avs, time_avs, reward_sds, time_sds = [], [], [], []
         episode_ts, episode_rewards = [], []
 
@@ -127,8 +142,8 @@ def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
                 if debug:
                     # plot current population curves
                     plt.figure(figsize = (22.0,12.0))
-                    plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','train','Qpops_train_' + str(int(episode/test_freq)) + '.png'))
-                    np.save(os.path.join(save_path,'WORKING_data','train','Qpops_train_' + str(int(episode/test_freq)) + '.npy'), xSol)
+                    plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','train','pops_train_' + str(int(episode/test_freq)) + '.png'))
+                    np.save(os.path.join(save_path,'WORKING_data','train','pops_train_' + str(int(episode/test_freq)) + '.npy'), xSol)
             else:
                 episode_rewards.append(running_reward)
                 episode_ts.append(t)
@@ -137,47 +152,49 @@ def neural_Q_learn(param_dict, save_path, debug = False, reward_func = False):
         network_save_path = saver.save(sess, os.path.join(save_path,'WORKING_saved_network','trained_network.ckpt'))
 
         # create and save state action plot
-        visited_states = visited_states.reshape([num_x_states]*num_species)
-        Q_actions = np.zeros((num_x_states**num_species))
-        for i in range(num_x_states**num_species):
-            if visited_states[i,j] == 0:
-                Q_actions[i,j] = - 1
+        Q_actions = np.zeros((num_N_states**num_species))
+
+        for i in range(num_N_states**num_species):
+            if visited_states[0,i] == 0:
+                Q_actions[i] = - 1
             else:
-                one_hot_state = np.zeros((1,num_x_states**num_species))
+                one_hot_state = np.zeros((1,num_N_states**num_species))
                 one_hot_state[0,i] = 1
                 allQ = np.array(sess.run(agent.predQ, feed_dict = {agent.inputs:one_hot_state}))
                 Q_actions[i] = np.argmax(allQ)
+
         np.save(os.path.join(save_path,'state_action.npy'), Q_actions)
 
         # plot results
         plt.figure(figsize = (16.0,12.0))
         plot_survival(time_avs,
-                      os.path.join(save_path,'WORKING_graphs','Q_train_survival.png'),
+                      os.path.join(save_path,'WORKING_graphs','train_survival.png'),
                       NUM_EPISODES, T_MAX, 'Training')
-        np.save(os.path.join(save_path,'WORKING_data','Q_train_survival.npy'), time_avs)
+        np.save(os.path.join(save_path,'WORKING_data','train_survival.npy'), time_avs)
 
         plt.figure(figsize = (22.0,12.0))
-        plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','Qpops.png'))
-        np.save(os.path.join(save_path,'WORKING_data','QPops.npy'), xSol)
+        plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','pops.png'))
+        np.save(os.path.join(save_path,'WORKING_data','Pops.npy'), xSol)
 
 
         plt.figure(figsize = (16.0,12.0))
         plot_rewards(rewards_avs,
-                     os.path.join(save_path,'WORKING_graphs','Qtrain_rewards.png'),
+                     os.path.join(save_path,'WORKING_graphs','train_rewards.png'),
                      NUM_EPISODES,T_MAX, 'Training')
 
         # save results
         np.save(os.path.join(save_path,'WORKING_data','Qtrain_rewards.npy'), rewards_avs)
         np.save(os.path.join(save_path,'visited_states.npy'), visited_states)
-        np.save(os.path.join(save_path,'reward_sds.npy'), reward_sds)
-        np.save(os.path.join(save_path,'time_sds.npy'), time_sds)
-
+        np.save(os.path.join(save_path,'WORKING_data', 'reward_sds.npy'), reward_sds)
+        np.save(os.path.join(save_path,'WORKING_data', 'time_sds.npy'), time_sds)
+        Q_actions = Q_actions.reshape([num_N_states]*num_species)
         print(np.rot90(Q_actions))
 
-        return agent, saver
+        return Q_actions
 
-if __name__ == '__main__': # for the server
 
+
+if __name__ == '__main__': # for running on the cluster
 
     three_species_parameters = {
         'ode_params': [1., 0.5, [480000., 480000., 480000.], [520000., 520000., 520000.], [0.6, 0.6, 0.6], [0.00048776, 0.00000102115, 0.00000102115], [0.00006845928, 0.00006845928,  0.00006845928]],
@@ -206,7 +223,7 @@ if __name__ == '__main__': # for the server
         'noise_params': [False, 0.1]
     }
 
-    #validate_param_dict(double_auxotroph_params)
+    validate_param_dict(double_auxotroph_params)
 
     try:
         directory = sys.argv[1]
@@ -215,7 +232,6 @@ if __name__ == '__main__': # for the server
     except:
         #save_path = '/home/zcqsntr/Scratch/neural/WORKING/'
         save_path = os.path.join('/Users','Neythen','masters_project','results','Q_learning_results','WORKING')
-
 
 
     neural_Q_learn(single_auxotroph, save_path, debug = True)

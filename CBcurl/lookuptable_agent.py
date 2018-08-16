@@ -9,10 +9,10 @@ class LookupTableAgent():
     '''
     Class that handles reinforcement learning using a lookuptable to store state-action value estimates
     '''
-    def __init__(self, num_x_states, num_Cin_states, num_species, num_controlled_species, reward_func = False):
+    def __init__(self, num_N_states, num_Cin_states, num_species, num_controlled_species, reward_func = False):
         '''
         Parameters:
-            num_x_states: the number of discrete population states the agent can see for each species
+            num_N_states: the number of discrete population states the agent can see for each species
             num_Cin_states: the number of different nutrient concentrations the agents can use for each auxotroph
             num_species: the number of different bacterial populations
         '''
@@ -24,8 +24,8 @@ class LookupTableAgent():
             self.reward = self.simple_reward
 
         # input validation
-        if num_x_states < 1 or not isinstance(num_x_states, int):
-            raise ValueError("num_x_States needs to be a positive integer")
+        if num_N_states < 1 or not isinstance(num_N_states, int):
+            raise ValueError("num_N_states needs to be a positive integer")
         if num_Cin_states < 1 or not isinstance(num_Cin_states, int):
             raise ValueError("num_Cin_States needs to be a positive integer")
         if num_species < 1 or not isinstance(num_species, int):
@@ -36,7 +36,7 @@ class LookupTableAgent():
             raise ValueError("num_controlled_species cannot be larger than num_species")
 
         #initilise Q_table
-        self.Q_table = np.zeros(tuple([num_x_states]*num_species + [num_Cin_states]*num_controlled_species))
+        self.Q_table = np.zeros(tuple([num_N_states]*num_species + [num_Cin_states]*num_controlled_species))
 
 
     def train_step(self, X, C, C0, t, explore_rate, learning_rate, Q_params, ode_params):
@@ -59,10 +59,10 @@ class LookupTableAgent():
             reward
         '''
         #extract parameters
-        A, num_species, num_controlled_species, num_x_states, x_bounds, num_Cin_states, Cin_bounds, gamma = Q_params
+        A, num_species, num_controlled_species, num_N_states, N_bounds, num_Cin_states, Cin_bounds, gamma = Q_params
 
         #discritise current state
-        state = np.array(state_to_bucket(X, x_bounds, num_x_states))
+        state = np.array(state_to_bucket(X, N_bounds, num_N_states))
 
         # select an action
         action_indeces = self.select_action(state, explore_rate, num_Cin_states, num_controlled_species)
@@ -75,7 +75,6 @@ class LookupTableAgent():
         #create state vector
         S = np.append(X, C)
         S = np.append(S, C0)
-
 
         # get next timsteps
         time_diff = 4  # frame skipping
@@ -96,7 +95,7 @@ class LookupTableAgent():
         reward = self.reward(X1)
 
         #discritise new state for next interation
-        state1 = state_to_bucket(X1, x_bounds, num_x_states)
+        state1 = state_to_bucket(X1, N_bounds, num_N_states)
 
         # update Q table
         best_q = np.max(self.Q_table[tuple(state)])

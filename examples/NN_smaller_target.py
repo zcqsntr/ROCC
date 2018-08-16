@@ -10,7 +10,7 @@ from utilities import *
 from neural_script import neural_Q_learn
 
 # open parameter file
-f = open(os.path.join('parameter_files', 'double_auxotroph.yaml'))
+f = open(os.path.join('parameter_files', 'smaller_target.yaml'))
 parameters = yaml.load(f)
 f.close()
 
@@ -22,6 +22,8 @@ def smaller_target_reward(X):
         reward = 1
     else:
         reward = -1
+    if any(x < 1/1000 for x in X):
+        reward = - 10
     return reward
 
 neural_Q_learn(parameters, save_path, debug = True, reward_func = smaller_target_reward)

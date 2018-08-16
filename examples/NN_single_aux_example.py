@@ -24,4 +24,4 @@ def single_aux_reward(X):
         reward = -1
     return reward
 
-neural_Q_learn(parameters, save_path, reward_func = single_aux_reward)
+neural_Q_learn(parameters, save_path, debug = True, reward_func = single_aux_reward)

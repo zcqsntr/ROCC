@@ -6,6 +6,7 @@ import yaml
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(ROOT_DIR, 'CBcurl'))
 
+
 from utilities import *
 from lookuptable_script import lookuptable_Q_learn
 

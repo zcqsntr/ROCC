@@ -14,6 +14,21 @@ from lookuptable_agent import *
 
 
 def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = False):
+    '''
+    Carries out a training run using a lookuptable agent
+
+    Parameters:
+        param_dict: dictionary containing the parameters of the system to be
+            trained on
+        save_path: path to save results
+        debug: if True debug inforamtion is periodically displayed and
+            intermediate population plots
+        reward_func: optional reward function that can be applied
+
+    Returns:
+        LT_actions: the learned state-action plot
+    '''
+
     matplotlib.rcParams.update({'font.size': 22})
 
     if debug: print('LOOKUPTABLE')
@@ -21,9 +36,11 @@ def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = Fals
     param_dict = convert_to_numpy(param_dict) # convert parameters to numpy arrays
 
     # extract parameters
-    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE, MAX_STEP_SIZE, MIN_EXPLORE_RATE, cutoff, _, _  = param_dict['train_params']
+    NUM_EPISODES, test_freq, explore_denom, step_denom, T_MAX,MIN_STEP_SIZE, \
+        MAX_STEP_SIZE, MIN_EXPLORE_RATE, cutoff, _, _  = param_dict['train_params']
     NOISE, error = param_dict['noise_params']
-    num_species, num_controlled_species, num_x_states, num_Cin_states = param_dict['Q_params'][1], param_dict['Q_params'][2],  param_dict['Q_params'][3],param_dict['Q_params'][5]
+    num_species, num_controlled_species, num_N_states, num_Cin_states = \
+        param_dict['Q_params'][1], param_dict['Q_params'][2],  param_dict['Q_params'][3],param_dict['Q_params'][5]
     ode_params = param_dict['ode_params']
     Q_params = param_dict['Q_params'][0:8]
     initial_X = param_dict['Q_params'][8]
@@ -31,16 +48,16 @@ def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = Fals
     initial_C0 = param_dict['Q_params'][10]
 
     #initialise results tracking
-    visited_states = np.zeros((1,num_x_states**num_species))
+    visited_states = np.zeros((1,num_N_states**num_species))
     test_rewards, rewards_avs, test_ts, time_avs, reward_sds, time_sds = [], [], [], [], [], []
     episode_ts, episode_rewards = [], []
 
-    agent = LookupTableAgent(num_x_states, num_Cin_states, num_species, num_controlled_species, reward_func)
+    agent = LookupTableAgent(num_N_states, num_Cin_states, num_species, num_controlled_species, reward_func)
 
     # make directories to store results
     os.makedirs(os.path.join(save_path, 'WORKING_data', 'train'), exist_ok = True)
     os.makedirs(os.path.join(save_path, 'WORKING_graphs', 'train'), exist_ok = True)
-    os.makedirs(os.path.join(save_path ,'WORKING_saved_Q_table', 'train'), exist_ok = True)
+
 
     for episode in range(1,NUM_EPISODES + 1):
         # reset for this episode
@@ -99,7 +116,7 @@ def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = Fals
             if debug:
                 # plot current population curves
                 plt.figure(figsize = (22.0,12.0))
-                plot_pops(xSol, os.path.join(save_path, 'WORKING_graphs', 'train','LTpops_train_' + str(episode/test_freq) + '.png'))
+                plot_pops(xSol, os.path.join(save_path, 'WORKING_graphs', 'train','pops_train_' + str(episode/test_freq) + '.png'))
                 np.save(os.path.join(save_path,'WORKING_data','train','train_' + str(int(episode/test_freq)) + '.npy'), xSol)
 
         else:
@@ -112,43 +129,42 @@ def lookuptable_Q_learn(param_dict, save_path, debug = False, reward_func = Fals
     # plot results
     plt.figure(figsize = (16.0,12.0))
     plot_survival(time_avs,
-                  os.path.join(save_path,'WORKING_graphs','LT_train_survival.png'),
+                  os.path.join(save_path,'WORKING_graphs','train_survival.png'),
                   NUM_EPISODES, T_MAX, 'Training')
-    np.save(os.path.join(save_path ,'WORKING_data','LT_train_survival.npy'), time_avs)
+    np.save(os.path.join(save_path ,'WORKING_data','train_survival.npy'), time_avs)
 
 
     plt.figure(figsize = (22.0,12.0))
-    plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','LTpops.png'))
-    np.save(os.path.join(save_path,'WORKING_data','LTPops.npy'), xSol)
+    plot_pops(xSol, os.path.join(save_path,'WORKING_graphs','pops.png'))
+    np.save(os.path.join(save_path,'WORKING_data','pops.npy'), xSol)
 
     plt.figure(figsize = (16.0,12.0))
     plot_rewards(rewards_avs,
-                 os.path.join(save_path,'WORKING_graphs','LTtrain_rewards.png'),
+                 os.path.join(save_path,'WORKING_graphs','train_rewards.png'),
                  NUM_EPISODES, T_MAX, 'Training')
 
     # save results
-    np.save(os.path.join(save_path,'WORKING_data','LTtrain_rewards.npy'), rewards_avs)
+    np.save(os.path.join(save_path,'WORKING_data','train_rewards.npy'), rewards_avs)
     np.save(os.path.join(save_path,'Q_table.npy'), agent.Q_table)
-    np.save(os.path.join(save_path,'reward_sds.npy'), reward_sds)
-    np.save(os.path.join(save_path,'time_sds.npy'), time_sds)
+    np.save(os.path.join(save_path,'WORKING_data', 'reward_sds.npy'), reward_sds)
+    np.save(os.path.join(save_path,'WORKING_data', 'time_sds.npy'), time_sds)
 
     # create and save state action plot
-    LT_actions = np.zeros([num_x_states] * num_species)
+    LT_actions = np.zeros([num_N_states] * num_species)
     lookuptable = agent.Q_table
-    for i in range(num_x_states):
-        for j in range(num_x_states):
+    for i in range(num_N_states):
+        for j in range(num_N_states):
             LT_actions[i,j] = np.argmax(lookuptable[i,j])
             if np.count_nonzero(lookuptable[i,j]) == 0:
                 LT_actions[i,j] = - 1
+
     np.save(os.path.join(save_path,'state_action.npy'), LT_actions)
 
     print(np.rot90(LT_actions))
 
-    return agent.Q_table
+    return LT_actions
 
-
-
-if __name__ == '__main__': # for the server
+if __name__ == '__main__': # for running on the cluster
 
     three_speces = {
         'ode_params': [1., 0.5, [480000., 480000., 480000.], [520000., 520000., 520000.], [0.6, 0.6, 0.6], [0.00048776, 0.00000102115, 0.00000102115], [0.00006845928, 0.00006845928,  0.00006845928]],
@@ -163,12 +179,15 @@ if __name__ == '__main__': # for the server
         'train_params': [1000, 10, 95, 100, 1000, 0.05, 0.5, 0., [50,50,50,50]],
         'noise_params': [False, 0.1]
     }
+
     smaller_target_params = {
         'ode_params': [1., 0.5, [480000., 480000.], [520000., 520000.], [0.6, 0.6], [0.00048776, 0.00048776], [0.00006845928, 0.00006845928]],
         'Q_params': [[[-0.0001, -0.0001],[-0.0001, -0.0001]], 2,2, 10, [0.,1000.], 2, [0., 0.1], 0.9, [250.,550.], [0.05,0.05], 1.],
         'train_params': [10000, 100, 950, 1000, 1000, 0.05, 0.5, 0., [50,50,50,50]],
         'noise_params': [False, 0.05]
     }
+
+    validate_param_dict(double_auxotroph_params)
 
     # if repeat number and directory supplied run repeats, else just run once
     try:

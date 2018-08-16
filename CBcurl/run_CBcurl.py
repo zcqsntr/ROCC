@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -53,7 +55,7 @@ def entry():
                 save_path = os.path.join(arguments.save_path, 'repeat' + str(i))
             else:
                 save_path = os.path.join('..','results','lookuptable_results','WORKING','repeat' + str(i))
-            lookup_table_Q_learn(parameters, save_path, debug)
+            lookuptable_Q_learn(parameters, save_path, debug)
     else:
         raise ValueError("Command line argument  'agent' needs to be L, N, or R")
 

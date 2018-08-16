@@ -73,7 +73,6 @@ for t in range(T_MAX):
         print('coexistanc')
 
 
-
 # plot
 plt.figure(figsize = (16.0,12.0))
 labels = ['N1', 'N2', 'C1', 'C2', 'C0']
