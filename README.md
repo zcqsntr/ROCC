@@ -1,6 +1,8 @@
 ## CBcurl: Control of Bacterial communities using reinforcement learning
 An application to train reinforcement learning to control a chemostat containing multiple interacting populations of bacteria.
 
+Has been tested on max OSX and ubuntu.
+
 ### Installation
 To use the package within python scropts, `CBcurl` must be in PYTHONPATH.
 To use the package from the command line `CBcurl` must be in you $PATH variable
