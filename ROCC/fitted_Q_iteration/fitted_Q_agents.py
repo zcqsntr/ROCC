@@ -32,7 +32,8 @@ class FittedQAgent():
 
         else:
             values = self.predict(state)
-
+            if np.isnan(values).any():
+                print('NAN IN VALUES!')
             self.values.append(values)
             action = np.argmax(values)
             self.actions.append(action)
@@ -67,12 +68,13 @@ class FittedQAgent():
                 rewards.append(reward)
                 dones.append(done)
 
-        print('shapes ', len(states), len(next_states), len(actions), len(rewards))
+
+
         states = np.array(states)
         next_states = np.array(next_states, dtype=np.float64)
         actions = np.array(actions)
         rewards = np.array(rewards)
-        print('shapes ', states.shape, next_states.shape, actions.shape, rewards.shape)
+
         # construct target
         values = self.predict(states)
         next_values = self.predict(next_states)
@@ -110,6 +112,8 @@ class FittedQAgent():
 
 
         history = self.fit(inputs, targets)
+
+
         return history
 
     def run_episode(self, env, explore_rate, tmax, train = True, remember = True):
@@ -257,6 +261,7 @@ class KerasFittedQAgent(FittedQAgent):
     Implementation of the neural network using keras
     '''
     def __init__(self, layer_sizes = [2,20,20,4]):
+
         self.memory = []
         self.layer_sizes = layer_sizes
         self.network = self.initialise_network(layer_sizes)
@@ -302,7 +307,9 @@ class KerasFittedQAgent(FittedQAgent):
         '''
         trains the Q network on a set of inputs and targets
         '''
-        history = self.network.fit(inputs, targets,  epochs = 500, batch_size = 256, verbose = False)
+
+        #history = self.network.fit(inputs, targets,  epochs = 500, batch_size = 256, verbose = False) used for nates system
+        history = self.network.fit(inputs, targets, epochs=200, batch_size=256, verbose=False)
         return history
 
     def reset_weights(self):
