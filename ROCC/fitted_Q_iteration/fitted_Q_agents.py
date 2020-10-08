@@ -34,6 +34,7 @@ class FittedQAgent():
             values = self.predict(state)
             if np.isnan(values).any():
                 print('NAN IN VALUES!')
+                print('state that gave nan:', state)
             self.values.append(values)
             action = np.argmax(values)
             self.actions.append(action)
@@ -96,6 +97,9 @@ class FittedQAgent():
         np.random.shuffle(randomize)
         inputs = inputs[randomize]
         targets = targets[randomize]
+
+        if np.isnan(targets).any():
+            print('NAN IN TARGETS!')
 
         return inputs, targets
 
@@ -284,16 +288,17 @@ class KerasFittedQAgent(FittedQAgent):
         tf.keras.backend.clear_session()
         initialiser = keras.initializers.RandomUniform(minval = -0.5, maxval = 0.5, seed = None)
         positive_initialiser = keras.initializers.RandomUniform(minval = 0., maxval = 0.35, seed = None)
-        regulariser = keras.regularizers.l1_l2(l1=0.01, l2=0.01)
+        regulariser = keras.regularizers.l1_l2(l1=1e-8, l2=1e-7)
         network = keras.Sequential()
         network.add(keras.layers.InputLayer([layer_sizes[0]]))
 
         for l in layer_sizes[1:-1]:
-            network.add(keras.layers.Dense(l, activation = tf.nn.relu))
-        network.add(keras.layers.Dense(layer_sizes[-1])) # linear output layer
+            network.add(keras.layers.Dense(l, activation = tf.nn.relu, kernel_regularizer=regulariser))
+        network.add(keras.layers.Dense(layer_sizes[-1], kernel_regularizer=regulariser)) # linear output layer
 
 
         network.compile(optimizer = 'adam', loss = 'mean_squared_error') # TRY DIFFERENT OPTIMISERS
+        #try clipnorm=1
         return network
 
     def predict(self, state):
