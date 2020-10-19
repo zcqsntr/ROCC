@@ -357,4 +357,5 @@ class KerasFittedQAgent(FittedQAgent):
         try:
             self.network = keras.models.load_model(load_path + '/saved_network.h5') # sometimes this crashes, apparently a bug in keras
         except:
+            print('EXCEPTION IN LOAD NETWORK')
             self.network.load_weights(load_path + '/saved_network.h5') # this requires model to be initialised exactly the same
