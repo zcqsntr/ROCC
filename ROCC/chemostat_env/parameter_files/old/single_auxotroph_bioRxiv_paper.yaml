@@ -1,0 +1,19 @@
+ode_params:
+  - 0.25 #C3in
+  - 0.5 # q (0-Rmax)
+  - [480000.] # y (10**12)
+  - [520000., 520000.] # y3 (10**12)
+  - [1.5, 3.] # Rmax (0.4 - 3)
+  - [0.00000102115] # Km (2) first bacteria not auxotroph so set to zero and ensure concentration is > 0
+  - [0.00006845928, 0.00006845928] # Km3 (2)
+  - [[0, 0],
+     [0, 0]] #A
+
+env_params:
+  - 2 # num_species
+  - 1 # num controlled species
+  - 2 # num_C0_states
+  - [0., 0.3] #C0_bounds
+  - [50000, 50000] # initial_X
+  - [0.1] # initial_C
+  - 0.25 #initial_C0

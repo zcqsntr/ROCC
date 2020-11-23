@@ -1,0 +1,12 @@
+ode_params:
+  - 0.5 # q (0-Rmax)
+  - [520000.] # y0 (10**12)
+  - [0.7] # Rmax (0.4 - 3)
+  - [0.00006845928] # Km0 (2)
+
+env_params:
+  - 1 # num_species
+  - 2 # num_Cin_states
+  - [0, 0.1] #Cin_bounds
+  - [30000.] # initial_N
+  - [0] #initial_C0

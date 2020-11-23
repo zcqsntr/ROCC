@@ -1,0 +1,46 @@
+
+ode_params:
+  - 1.5 #C0in
+  - 0.4 # q (0-Rmax)
+  - [480000000000., 480000000000., 480000000000.] # y (10**12)
+  - [520000000000., 450000000000., 520000000000.] # y3 (10**12)
+  - [0.6, 0.6, 0.7] # Rmax (0.4 - 3)
+  - [0.00048776, 0.000000102115, 0.00048776] # Km (2)
+  - [0.00006845928, 0.00006845928, 0.00006845928] # Km3 (2)
+  - [[-0.0001, -0.0001, -0.0001],
+     [-0.0001, -0.0001, -0.0001],
+     [-0.0001, -0.0001, -0.0001]] #A
+
+Q_params:
+
+  - 3 # num_species
+  - 3 # num_controlled_species
+  - 10 # num_x_states
+  - [0., 1000.] # x_bounds
+  - 2 # num_C0_states
+  - [0., 0.1] #C0_bounds
+  - 0.9 #gamma
+  - [200000000., 2000000000., 200000000.] # initial_X
+  - [0.1, 0.1, 0.1] # initial_C
+  - 1.5 #initial_C0
+
+
+train_params:
+  - 10000 # num_episodes
+  - 100 # test_freq
+  - 970 # explore_denom
+  - 1000 # step_denom
+  - 1000 # T_MAX
+  - 0.05 # MIN_STEP_SIZE
+  - 0.5 # MAX_STEP_SIZE
+  - 0. #MIN_EXPLORE_RATE
+  - 1. # MAX_EXPLORE_RATE
+  - 0.001 # cuttoff
+  - [50,50,50,50]
+  - 1000 # buffer_size
+
+
+
+noise_params:
+  - False # noise
+  - 0.1 # error

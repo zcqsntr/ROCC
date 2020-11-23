@@ -42,15 +42,51 @@ class FittedQAgent():
         assert action < self.n_actions, 'Invalid action'
         return action
 
+    def get_actions(self, states, explore_rate):
+        '''
+        PARALLEL version of get action
+        Choses action based on enivormental state, explore rate and current value estimates
+
+        Parameters:
+            state: environmental state
+            explore_rate
+        Returns:
+            action
+        '''
+        rng = np.random.random(len(states))
+
+        explore_inds = np.where(rng < explore_rate)[0]
+
+        exploit_inds = np.where(rng >= explore_rate)[0]
+
+        explore_actions = np.random.choice(range(self.layer_sizes[-1]), len(explore_inds))
+        actions = np.zeros((len(states)), dtype=np.int32)
+
+        if len(exploit_inds) > 0:
+            values = self.predict(np.array(states)[exploit_inds])
+
+
+            if np.isnan(values).any():
+                print('NAN IN VALUES!')
+                print('states that gave nan:', states)
+            self.values.extend(values)
+
+
+            exploit_actions = np.argmax(values, axis = 1)
+            actions[exploit_inds] = exploit_actions
+
+
+        actions[explore_inds] = explore_actions
+        self.actions.extend(actions)
+        return actions
+
+
+
     def get_inputs_targets(self):
         '''
         gets fitted Q inputs and calculates targets for training the Q-network for episodic training
         '''
-
-
         targets = []
-
-
         states = []
         next_states = []
         actions = []
