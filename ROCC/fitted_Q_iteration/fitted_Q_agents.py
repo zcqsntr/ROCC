@@ -145,12 +145,13 @@ class FittedQAgent():
         '''
 
         if inputs is None and targets is None:
+            t = time.time()
             inputs, targets = self.get_inputs_targets()
 
+        t = time.time()
         self.reset_weights()
 
-
-
+        t = time.time()
         history = self.fit(inputs, targets)
 
 
@@ -305,7 +306,7 @@ class KerasFittedQAgent(FittedQAgent):
         self.memory = []
         self.layer_sizes = layer_sizes
         self.network = self.initialise_network(layer_sizes)
-        self.gamma = 1
+        self.gamma = 1.
         self.state_size = layer_sizes[0]
         self.n_actions = layer_sizes[-1]
         self.episode_lengths = []
@@ -324,16 +325,16 @@ class KerasFittedQAgent(FittedQAgent):
         tf.keras.backend.clear_session()
         initialiser = keras.initializers.RandomUniform(minval = -0.5, maxval = 0.5, seed = None)
         positive_initialiser = keras.initializers.RandomUniform(minval = 0., maxval = 0.35, seed = None)
-        regulariser = keras.regularizers.l1_l2(l1=1e-8, l2=1e-7)
+        regulariser = keras.regularizers.l1_l2(l1=0, l2=1e-6)
         network = keras.Sequential()
         network.add(keras.layers.InputLayer([layer_sizes[0]]))
 
         for l in layer_sizes[1:-1]:
-            network.add(keras.layers.Dense(l, activation = tf.nn.relu, kernel_regularizer=regulariser))
-        network.add(keras.layers.Dense(layer_sizes[-1], kernel_regularizer=regulariser)) # linear output layer
+            network.add(keras.layers.Dense(l, activation = tf.nn.relu))
+        network.add(keras.layers.Dense(layer_sizes[-1])) # linear output layer
 
-
-        network.compile(optimizer = 'adam', loss = 'mean_squared_error') # TRY DIFFERENT OPTIMISERS
+        opt = keras.optimizers.Adam()
+        network.compile(optimizer = opt, loss = 'mean_squared_error') # TRY DIFFERENT OPTIMISERS
         #try clipnorm=1
         return network
 
@@ -350,7 +351,8 @@ class KerasFittedQAgent(FittedQAgent):
         '''
 
         #history = self.network.fit(inputs, targets,  epochs = 500, batch_size = 256, verbose = False) used for nates system
-        history = self.network.fit(inputs, targets, epochs=200, batch_size=256, verbose=False)
+        #history = self.network.fit(inputs, targets, epochs=200, batch_size=256, verbose=False) # used for single chemostat before time units error corrected
+        history = self.network.fit(inputs, targets, validation_split = 0.1, epochs=5, batch_size=256, verbose=True)
         return history
 
     def reset_weights(self):
@@ -390,8 +392,10 @@ class KerasFittedQAgent(FittedQAgent):
         '''
         Loads network weights from file
         '''
+
         try:
             self.network = keras.models.load_model(load_path + '/saved_network.h5') # sometimes this crashes, apparently a bug in keras
         except:
             print('EXCEPTION IN LOAD NETWORK')
+
             self.network.load_weights(load_path + '/saved_network.h5') # this requires model to be initialised exactly the same
