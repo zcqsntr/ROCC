@@ -352,7 +352,7 @@ class KerasFittedQAgent(FittedQAgent):
 
         #history = self.network.fit(inputs, targets,  epochs = 500, batch_size = 256, verbose = False) used for nates system
         #history = self.network.fit(inputs, targets, epochs=200, batch_size=256, verbose=False) # used for single chemostat before time units error corrected
-        history = self.network.fit(inputs, targets, validation_split = 0.01, epochs=20, batch_size=256, verbose = True)
+        history = self.network.fit(inputs, targets, validation_split = 0.01, epochs=20, batch_size=256, verbose = False)
         return history
 
     def reset_weights(self):
