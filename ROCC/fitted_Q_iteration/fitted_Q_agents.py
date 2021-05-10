@@ -16,6 +16,7 @@ class FittedQAgent():
     abstract class for the Torch and Keras implimentations, dont use directly
 
     '''
+
     def get_action(self, state, explore_rate):
         '''
         Choses action based on enivormental state, explore rate and current value estimates
@@ -123,7 +124,8 @@ class FittedQAgent():
 
                 values[i, actions[i]] = rewards[i]
             else:
-                values[i, actions[i]] = rewards[i] + self.gamma * np.max(next_values[i])
+                #values[i, actions[i]] = rewards[i] + self.gamma * np.max(next_values[i]) q learning
+                values[i, actions[i]] = rewards[i] + self.gamma * next_values[i, actions[i]] # sarsa
 
         # shuffle inputs and target for IID
         inputs, targets  = np.array(states), np.array(values)
@@ -139,6 +141,73 @@ class FittedQAgent():
 
         return inputs, targets
 
+    def get_inputs_targets_MC(self):
+        '''
+        gets fitted Q inputs and calculates targets for training the Q-network for episodic training
+        '''
+        targets = []
+        states = []
+        next_states = []
+        actions = []
+        rewards = []
+        dones = []
+        all_values = []
+
+
+
+        # iterate over all exprienc in memory and create fitted Q targets
+        for trajectory in self.memory:
+
+            e_rewards = []
+            for transition in trajectory:
+                state, action, reward, next_state, done = transition
+
+                states.append(state)
+                next_states.append(next_state)
+                actions.append(action)
+                rewards.append(reward)
+                e_rewards.append(reward)
+                dones.append(done)
+
+
+            e_values = [e_rewards[-1]]
+
+            for i in range(2, len(e_rewards) + 1):
+                e_values.insert(0, e_rewards[-i] + e_values[0] * self.gamma)
+            all_values.extend(e_values)
+
+
+        states = np.array(states)
+        next_states = np.array(next_states, dtype=np.float64)
+        actions = np.array(actions)
+        rewards = np.array(rewards)
+
+        # construct target
+        values = self.predict(states)
+        next_values = self.predict(next_states)
+
+        #update the value for the taken action using cost function and current Q
+        for i in range(len(next_states)):
+            # print(actions[i], rewards[i])
+
+            values[i, actions[i]] = all_values[i]
+
+        # shuffle inputs and target for IID
+        inputs, targets  = np.array(states), np.array(values)
+
+
+        randomize = np.arange(len(inputs))
+        np.random.shuffle(randomize)
+        inputs = inputs[randomize]
+        targets = targets[randomize]
+
+        if np.isnan(targets).any():
+            print('NAN IN TARGETS!')
+
+
+        return inputs, targets
+
+
     def fitted_Q_update(self, inputs = None, targets = None):
         '''
         Uses a set of inputs and targets to update the Q network
@@ -146,7 +215,7 @@ class FittedQAgent():
 
         if inputs is None and targets is None:
             t = time.time()
-            inputs, targets = self.get_inputs_targets()
+            inputs, targets = self.get_inputs_targets_MC()
 
         t = time.time()
         self.reset_weights()
