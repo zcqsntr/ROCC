@@ -124,8 +124,8 @@ class FittedQAgent():
 
                 values[i, actions[i]] = rewards[i]
             else:
-                #values[i, actions[i]] = rewards[i] + self.gamma * np.max(next_values[i]) q learning
-                values[i, actions[i]] = rewards[i] + self.gamma * next_values[i, actions[i]] # sarsa
+                values[i, actions[i]] = rewards[i] + self.gamma * np.max(next_values[i]) # q learning
+                #values[i, actions[i]] = rewards[i] + self.gamma * next_values[i, actions[i]] # sarsa
 
         # shuffle inputs and target for IID
         inputs, targets  = np.array(states), np.array(values)
@@ -215,7 +215,7 @@ class FittedQAgent():
 
         if inputs is None and targets is None:
             t = time.time()
-            inputs, targets = self.get_inputs_targets_MC()
+            inputs, targets = self.get_inputs_targets()
 
         t = time.time()
         self.reset_weights()
