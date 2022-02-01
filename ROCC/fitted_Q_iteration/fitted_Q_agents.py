@@ -9,7 +9,7 @@ from tensorflow import keras
 
 
 import matplotlib.pyplot as plt
-
+import gc
 class FittedQAgent():
 
     '''
@@ -83,7 +83,7 @@ class FittedQAgent():
 
 
 
-    def get_inputs_targets(self):
+    def get_inputs_targets(self, alpha = 1):
         '''
         gets fitted Q inputs and calculates targets for training the Q-network for episodic training
         '''
@@ -124,8 +124,8 @@ class FittedQAgent():
 
                 values[i, actions[i]] = rewards[i]
             else:
-                values[i, actions[i]] = rewards[i] + self.gamma * np.max(next_values[i]) # q learning
-                #values[i, actions[i]] = rewards[i] + self.gamma * next_values[i, actions[i]] # sarsa
+                values[i, actions[i]] = (1-alpha)*values[i, actions[i]] + alpha*(rewards[i] + self.gamma * np.max(next_values[i])) # q learning
+                #y9yyvalues[i, actions[i]] = rewards[i] + self.gamma * next_values[i, actions[i]] # sarsa
 
         # shuffle inputs and target for IID
         inputs, targets  = np.array(states), np.array(values)
@@ -208,14 +208,14 @@ class FittedQAgent():
         return inputs, targets
 
 
-    def fitted_Q_update(self, inputs = None, targets = None):
+    def fitted_Q_update(self, inputs = None, targets = None, alpha = 1):
         '''
         Uses a set of inputs and targets to update the Q network
         '''
 
         if inputs is None and targets is None:
             t = time.time()
-            inputs, targets = self.get_inputs_targets()
+            inputs, targets = self.get_inputs_targets(alpha)
 
         t = time.time()
         self.reset_weights()
@@ -353,10 +353,10 @@ class FittedQAgent():
 
         # input validation
         if not 0 <= MIN_LEARNING_RATE <= 1:
-            raise ValueError("MIN_LEARNING_RATE needs to be bewteen 0 and 1")
+            raise ValueError("MIN_LEARNING_RATE needs to be between 0 and 1")
 
         if not 0 <= MAX_LEARNING_RATE <= 1:
-            raise ValueError("MAX_LEARNING_RATE needs to be bewteen 0 and 1")
+            raise ValueError("MAX_LEARNING_RATE needs to be between 0 and 1")
 
         if not 0 < denominator:
             raise ValueError("denominator needs to be above 0")
@@ -412,7 +412,7 @@ class KerasFittedQAgent(FittedQAgent):
         Predicts value estimates for each action base on currrent states
         '''
 
-        return self.network.predict(state.reshape(-1,self.layer_sizes[0]))
+        return self.network.predict(state)
 
     def fit(self, inputs, targets):
         '''
@@ -430,7 +430,10 @@ class KerasFittedQAgent(FittedQAgent):
         '''
         #sess = tf.keras.backend.get_session()
         #sess.run(tf.global_variables_initializer())
-        t = time.time()
+        del self.network
+        gc.collect()
+        tf.keras.backend.clear_session()
+        tf.compat.v1.reset_default_graph()
         self.network = self.initialise_network(self.layer_sizes)
 
     def save_network(self, save_path):
